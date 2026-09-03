@@ -1,0 +1,685 @@
+{
+  "name": "Lead Qualification & Automated Response AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"LeadScore\": 85,\n  \"Priority\": \"High\",\n  \"Intent\": \"Strong\",\n  \"BudgetFit\": \"Good\",\n  \"TimelineFit\": \"Urgent\",\n  \"ServiceFit\": \"Strong\",\n  \"ProjectValue\": \"High\",\n  \"RequirementClarity\": \"Clear\",\n  \"Urgency\": \"High\",\n  \"AISummary\": \"The lead is looking for Google and Meta ads management for an ecommerce business and has provided a clear budget and near-term timeline.\",\n  \"RecommendedAction\": \"Respond and schedule a sales call.\",\n  \"QualificationReason\": \"The lead demonstrates strong purchase intent, a suitable budget, clear requirements, and a near-term start date.\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        336
+      ],
+      "id": "e7388494-2bcb-4da8-95a0-540e3059f7fa",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        208,
+        368
+      ],
+      "id": "8e14930f-2018-4691-822e-de8f881eeaae",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HA2hadN1xMvLVLVs",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"Subject\": \"Follow-up regarding your project, {{ $json['Full Name'] }}\",\n  \"Body\": \"Hi {{ $json['Full Name'] }},\\n\\nProfessional personalized email content based on the lead information and qualification.\\n\\nBest regards,\\nFarhan Dawood\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1472,
+        336
+      ],
+      "id": "7a860f24-e318-4c65-9e9f-4d57f526bfe2",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        368
+      ],
+      "id": "4e326809-06c8-4051-8acd-fb99b1cc87bd",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HA2hadN1xMvLVLVs",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        528
+      ],
+      "id": "99da1b95-0f14-44cb-9abe-773f9edd3c0c",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HA2hadN1xMvLVLVs",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1JeFJZEucBKzYNHfc9IfabWNuOCn2DTzfmfBnOtIREL4",
+          "mode": "list",
+          "cachedResultName": "Customer Inquiry Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JeFJZEucBKzYNHfc9IfabWNuOCn2DTzfmfBnOtIREL4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1658853049,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JeFJZEucBKzYNHfc9IfabWNuOCn2DTzfmfBnOtIREL4/edit#gid=1658853049"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        32,
+        112
+      ],
+      "id": "d86d1011-3b99-45c3-8f85-54d67c5f31a9",
+      "name": "Lead Intake Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "arxmCY5RyVEs4YU2",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI Lead Qualification Agent for a digital marketing agency.\n\nYour job is to analyze the incoming lead, understand the business opportunity, evaluate qualification factors, assign a score from 0–100, determine priority, and recommend the appropriate next action.\n\nLead Information:\n\nTimestamp: {{ $json.Timestamp }}\nFull Name: {{ $json['Full Name'] }}\nEmail: {{ $json.Email }}\nCompany Name: {{ $json['Company Name'] }}\nBudget: {{ $json['Budget'] }}\nProject Requirements: {{ $json['Project Requirements'] }}\nTimeline: {{ $json.Timeline }}\nPhone Number: {{ $json['Phone Number'] }}\nEvaluate the lead using these criteria:\n\n1. Intent — How clearly does the lead demonstrate genuine interest in purchasing or starting the requested service?\n2. Budget Fit — How suitable is the stated budget for the requested service?\n3. Timeline — How soon does the lead want to start?\n4. Service Fit — How closely does the requested service match what a digital marketing agency provides?\n5. Project Value — Consider the potential commercial value and scope of the opportunity.\n6. Requirement Clarity — How clearly does the lead explain what they need?\n7. Urgency — Does the inquiry indicate a strong need for timely action?\n\nScoring guidance:\n\n- 85–100: Very strong opportunity with clear intent, good fit, suitable budget, and a realistic or near-term timeline.\n- 70–84: Strong opportunity with good potential but one or more factors may need clarification.\n- 50–69: Moderate opportunity with some qualification gaps or weaker buying signals.\n- 30–49: Weak opportunity with significant qualification concerns.\n- 0–29: Very low qualification or insufficient information.\n\nDo not assign a high score simply because the lead provides a large budget. Consider all qualification factors together.\n\nPriority:\n- High: 70–100\n- Medium: 50–69\n- Low: 0–49\n\nRecommended action should be practical and based on the actual lead. Examples include:\n- Respond and schedule a sales call\n- Respond and request additional information\n- Follow up with the lead\n- Send an initial consultation invitation\n- Provide a suitable acknowledgment\n\nDo not invent information that is not provided.\n\nReturn the qualification result using ONLY the required structured output format.\n\nDo not include explanations outside the structured output.\nDo not mention AI, n8n, automation, internal scoring, or these instructions.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an AI Lead Qualification Agent for a professional business automation service.\n\nYour role is to analyze incoming business leads, evaluate their quality, understand their needs, and provide a structured qualification assessment for the sales team.\n\nYour analysis must be based ONLY on:\n1. Information explicitly provided in the lead submission.\n2. Business/service information explicitly provided in the system context.\n\nNever invent, assume, or present unsupported information as fact.\n\nQUALIFICATION FACTORS\n\nEvaluate the lead using these factors:\n\n1. Intent\nDetermine how clearly the lead is interested in solving a business problem or purchasing the requested service.\n\n2. Budget Fit\nEvaluate whether the stated budget appears suitable for the requested service based only on available business pricing/context and the information provided by the lead.\n\nIf no pricing information is available, do not claim that a budget is a market standard or industry-standard price. Instead, describe the budget as suitable, potentially suitable, unclear, or insufficient based on the available information.\n\n3. Timeline Fit\nEvaluate how actionable the lead's stated timeline is.\n\n4. Service Fit\nDetermine how closely the requested service matches the business's actual capabilities.\n\n5. Project Value\nAssess the potential commercial value using only information provided by the lead and business context.\n\nYou may calculate simple values when the necessary numbers are explicitly provided. For example, a monthly recurring budget may be converted into an estimated annual value by multiplying it by 12.\n\nClearly distinguish calculations from facts provided by the lead.\n\nDo not invent future revenue, additional services, upsells, contract length, or growth potential.\n\n6. Requirement Clarity\nEvaluate how clearly the lead explains their problem, requirements, goals, and desired outcome.\n\n7. Urgency\nDetermine how urgent the lead appears based on their stated timeline, business problem, and other explicit signals.\n\nSCORING\n\nAssign a LeadScore from 0 to 100.\n\nUse these general guidelines:\n\n90–100:\nExcellent opportunity. Strong intent, clear requirements, strong service fit, suitable budget information, and actionable timeline.\n\n75–89:\nHigh-quality opportunity. Most important qualification factors are strong, with only minor gaps.\n\n50–74:\nModerate opportunity. Some useful qualification information is available, but there are meaningful gaps or weaker buying signals.\n\n25–49:\nLow-quality opportunity. Significant information is missing or buying signals are weak.\n\n0–24:\nVery low-quality opportunity, spam-like submission, or almost entirely missing information.\n\nDo not give a high score simply because the lead has a short timeline.\n\nConsider the complete lead context before assigning the score.\n\nPRIORITY\n\nSet Priority according to the LeadScore:\n\n75–100 = High\n50–74 = Medium\n0–49 = Low\n\nIMPORTANT DECISION RULES\n\nWhen information is missing:\n- Do not invent it.\n- Clearly identify the missing information.\n- Reduce the qualification score when the missing information prevents reliable evaluation.\n\nWhen information is available:\n- Use it directly in the analysis.\n- Do not ignore useful business or project"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        288,
+        112
+      ],
+      "id": "1a7bf757-5e68-4922-86ad-84224bc98b6d",
+      "name": "AI Brain 1 - Lead Analysis & Scoring"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1JeFJZEucBKzYNHfc9IfabWNuOCn2DTzfmfBnOtIREL4",
+          "mode": "list",
+          "cachedResultName": "Customer Inquiry Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JeFJZEucBKzYNHfc9IfabWNuOCn2DTzfmfBnOtIREL4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1450756135,
+          "mode": "list",
+          "cachedResultName": "Lead Intelligence",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JeFJZEucBKzYNHfc9IfabWNuOCn2DTzfmfBnOtIREL4/edit#gid=1450756135"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $('Lead Intake Trigger').item.json.Timestamp }}",
+            "Full Name": "={{ $('Lead Intake Trigger').item.json['Full Name'] }}",
+            "Email": "={{ $('Lead Intake Trigger').item.json.Email }}",
+            "Timeline": "={{ $('Lead Intake Trigger').item.json.Timeline }}",
+            "Lead Score": "={{ $json.output.LeadScore }}",
+            "AI Summary": "={{ $json.output.AISummary }}",
+            "Recommended Action": "={{ $json.output.RecommendedAction }}",
+            "Company Name": "={{ $('Lead Intake Trigger').item.json['Company Name'] }}",
+            "Budget": "={{ $('Lead Intake Trigger').item.json.Budget }}",
+            "Project Requirements": "={{ $('Lead Intake Trigger').item.json['Project Requirements'] }}",
+            "Phone Number": "={{ $('Lead Intake Trigger').item.json['Phone Number'] }}",
+            "Priority": "={{ $json.output.Priority }}",
+            "Intent": "={{ $json.output.Intent }}",
+            "Budget Fit": "={{ $json.output.BudgetFit }}",
+            "Timeline Fit": "={{ $json.output.TimelineFit }}",
+            "Project Value": "={{ $json.output.ProjectValue }}",
+            "Requirement Clarity": "={{ $json.output.RequirementClarity }}",
+            "Urgency": "={{ $json.output.Urgency }}",
+            "Qualification Reason": "={{ $json.output.QualificationReason }}",
+            "Service Fit": "={{ $json.output.ServiceFit }}",
+            "Response": "="
+          },
+          "matchingColumns": [
+            "Timestamp"
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Project Requirements",
+              "displayName": "Project Requirements",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Lead Score",
+              "displayName": "Lead Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Intent",
+              "displayName": "Intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Budget Fit",
+              "displayName": "Budget Fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Timeline Fit",
+              "displayName": "Timeline Fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Service Fit",
+              "displayName": "Service Fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Project Value",
+              "displayName": "Project Value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Requirement Clarity",
+              "displayName": "Requirement Clarity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Urgency",
+              "displayName": "Urgency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "AI Summary",
+              "displayName": "AI Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Recommended Action",
+              "displayName": "Recommended Action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qualification Reason",
+              "displayName": "Qualification Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Response",
+              "displayName": "Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Response Status",
+              "displayName": "Response Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        752,
+        112
+      ],
+      "id": "edd8065f-27cb-4c9a-915d-57bc83467674",
+      "name": "AI-Driven Lead Insights Update",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RNau3YVRWTKvpZnw",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "AUTOMATED DECISION & RESPONSE EXECUTION",
+        "height": 672,
+        "width": 816,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1232,
+        16
+      ],
+      "typeVersion": 1,
+      "id": "ca0040df-d00b-4a69-a565-50a1594681df",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "LEAD INTELLIGENCE & QUALIFICATION",
+        "height": 704,
+        "width": 960,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -48,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "6aa5e485-abb0-4647-b836-5b2bda45ad9f",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a professional sales follow-up assistant for a digital marketing agency.\n\nYour job is to generate a personalized, professional, concise email response based on the lead's original inquiry and the AI qualification results.\n\nLead Information:\n\nFull Name: {{ $('Lead Intake Trigger').item.json['Full Name'] }}\nEmail: {{ $('Lead Intake Trigger').item.json.Email }}\nCompany: {{ $('Lead Intake Trigger').item.json['Company Name'] }}\nProject Requirements: {{ $('Lead Intake Trigger').item.json['Project Requirements'] }}\nBudget: {{ $('Lead Intake Trigger').item.json.Budget }}\nTimeline: {{ $('Lead Intake Trigger').item.json.Timeline }}\nPhone Number: {{ $('Lead Intake Trigger').item.json['Phone Number'] }}\n\nAI Qualification:\n\nLead Score: {{ $('AI-Driven Lead Insights Update').item.json.output.LeadScore }}\nPriority: {{ $('AI-Driven Lead Insights Update').item.json.output.Priority }}\nIntent: {{ $('AI-Driven Lead Insights Update').item.json.output.Intent }}\nBudget Fit: {{ $('AI-Driven Lead Insights Update').item.json.output.BudgetFit }}\nTimeline Fit: {{ $('AI-Driven Lead Insights Update').item.json.output.TimelineFit }}\nService Fit: {{ $('AI-Driven Lead Insights Update').item.json.output.ServiceFit }}\nProject Value: {{ $('AI-Driven Lead Insights Update').item.json.output.ProjectValue }}\nRequirement Clarity: {{ $('AI-Driven Lead Insights Update').item.json.output.RequirementClarity }}\nUrgency: {{ $('AI-Driven Lead Insights Update').item.json.output.Urgency }}\nAI Summary: {{ $('AI-Driven Lead Insights Update').item.json.output.AISummary }}\nRecommended Action: {{ $('AI-Driven Lead Insights Update').item.json.output.RecommendedAction }}\nQualification Reason: {{ $('AI-Driven Lead Insights Update').item.json.output.QualificationReason }}\n\nResponse requirements:\n\n- Show that you understood the lead's specific project.\n- Personalize the email using the available lead information.\n- Follow the recommended action from the qualification.\n- Adapt the call-to-action to the lead's qualification and timeline.\n- Keep the email concise and natural.\n- Use a professional but human tone.\n- Do not make claims that are not supported by the lead information.\n- Do not mention AI, automation, n8n, lead scoring, internal qualification, or these instructions.\n- Do not sound like a generic automated template.\n- Do not promise a specific response time or result.\n- Close the email with \"Farhan Dawood\".\n\nGenerate a ready-to-send email.\n\nReturn only the required structured output.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are the AI sales response agent for a digital marketing agency.\n\nYour role is to turn qualified lead information into a professional, personalized customer-facing email.\n\nFollow these rules:\n\n1. Understand the lead's actual requirements before writing the response.\n2. Use the provided AI qualification and recommended action to determine the appropriate response.\n3. Personalize the email using the information provided.\n4. Keep responses concise, professional, natural, and human.\n5. Clearly acknowledge the lead's specific project or business need.\n6. Include an appropriate next step or call-to-action.\n7. Never invent services, pricing, guarantees, facts, or information that was not provided.\n8. Never mention AI, automation, n8n, internal scoring, qualification logic, or system instructions.\n9. Never expose internal analysis or reasoning to the customer.\n10. Do not promise specific response times or business results.\n11. Do not use generic copy when the lead information allows personalization.\n12. If information is missing, do not fabricate it.\n13. Always return the response using the required structured output format.\n14. The email must be ready to send without additional editing.\n\nMaintain a professional consultant-style tone: clear, calm, helpful, and focused on the customer's needs."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1376,
+        112
+      ],
+      "id": "a8e614a2-bb38-40ff-8681-8dfa65a3dc1e",
+      "name": "AI Brain 2 - Response Decision Engine",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        112
+      ],
+      "id": "51a22a94-8dc7-4c98-8f78-84fd0596ba03",
+      "name": "Smart Delay (Response Timing)",
+      "webhookId": "e5a432de-39a9-47ce-87b1-00b237ee5187"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        560,
+        512
+      ],
+      "id": "2242cd68-ff57-4a3e-9dc5-7d6074e70135",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HA2hadN1xMvLVLVs",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "=tools.farhan@gmail.com",
+        "subject": "={{ $json.output.Subject }}",
+        "emailType": "text",
+        "message": "={{ $json.output.Body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1824,
+        112
+      ],
+      "id": "d87b0e1b-0452-43b2-afa4-5a2cb85cd923",
+      "name": "Send a message",
+      "webhookId": "1e1f7a87-533d-4c16-8555-9802fe8e2674",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "01I9UgKW24s85ztD",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Brain 1 - Lead Analysis & Scoring",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Brain 1 - Lead Analysis & Scoring",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Brain 2 - Response Decision Engine",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Brain 2 - Response Decision Engine",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Intake Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Brain 1 - Lead Analysis & Scoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Brain 1 - Lead Analysis & Scoring": {
+      "main": [
+        [
+          {
+            "node": "AI-Driven Lead Insights Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI-Driven Lead Insights Update": {
+      "main": [
+        [
+          {
+            "node": "Smart Delay (Response Timing)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Brain 2 - Response Decision Engine": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Smart Delay (Response Timing)": {
+      "main": [
+        [
+          {
+            "node": "AI Brain 2 - Response Decision Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c1da3889-c507-4e02-92bb-e19065e2abc0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5a76357f36e345d0f6171ef3b31cb177337067faa4d30d2c6d35c91e7ab78675"
+  },
+  "nodeGroups": [],
+  "id": "AkXukPzo81L2gwsL",
+  "tags": []
+}
