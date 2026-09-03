@@ -38,6 +38,11 @@ The system:
 6. Uses a second AI Agent to determine the appropriate communication approach.
 7. Generates a personalized response.
 8. Sends the response automatically through Gmail.
+## Demo Video
+
+Watch the project demonstration on YouTube:
+
+https://youtu.be/o7zj88ya-dQ?si=dZ1ETszOYGsvH3Cq
 
 ## Workflow Architecture
 
@@ -68,8 +73,7 @@ Automated Personalized Response
 Gmail
 
 
-##Demo Video
 
-Watch the project demonstration on YouTube:
 
-https://youtu.be/o7zj88ya-dQ?si=dZ1ETszOYGsvH3Cq
+
+
