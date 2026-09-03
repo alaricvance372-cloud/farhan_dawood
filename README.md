@@ -66,3 +66,10 @@ Automated Personalized Response
      │
      ▼
 Gmail
+
+
+## Demo Video
+
+Watch the project demonstration on YouTube:
+
+https://youtu.be/o7zj88ya-dQ?si=dZ1ETszOYGsvH3Cq
